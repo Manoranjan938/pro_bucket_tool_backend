@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.organization.projectManagement.entity.User;
@@ -25,7 +26,7 @@ import com.organization.projectManagement.service.UserService;
 import com.organization.projectManagement.service.ValidationErrorService;
 
 @RestController
-@RequestMapping("/authenticate")
+@RequestMapping("/api/authenticate")
 @CrossOrigin("https://localhost:3002")
 public class AuthController {
 
@@ -70,6 +71,15 @@ public class AuthController {
 		String jwt = SecurityConstants.TOKEN_PREFIX + tokenProvider.generateToken(auth);
 		
 		return ResponseEntity.ok(new JWTLoginResponse(true, jwt));
+	}
+	
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<?> processForgotPassword(@RequestParam("email") String email){
+		
+		userService.updateResetPassword(email);
+		
+		return new ResponseEntity<String>("", HttpStatus.CREATED);
 	}
 	
 }

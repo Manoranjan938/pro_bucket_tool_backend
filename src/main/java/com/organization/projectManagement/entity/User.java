@@ -53,6 +53,8 @@ public class User implements UserDetails {
 	
 	private String providerId;
 	
+	private String resetPasswordToken;
+	
 	private int status;
 
 	public Long getId() {
@@ -149,6 +151,14 @@ public class User implements UserDetails {
 
 	public void setProjects(List<ProjectEntity> projects) {
 		this.projects = projects;
+	}
+
+	public String getResetPasswordToken() {
+		return resetPasswordToken;
+	}
+
+	public void setResetPasswordToken(String resetPasswordToken) {
+		this.resetPasswordToken = resetPasswordToken;
 	}
 
 	@Override
