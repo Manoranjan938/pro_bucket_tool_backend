@@ -2,7 +2,7 @@ package com.organization.projectManagement.security;
 
 public class SecurityConstants {
 
-	public static final String SIGN_UP_URLS = "/authenticate/**";
+	public static final String SIGN_UP_URLS = "/api/authenticate/**";
 	
 	public static final String SECRET = "SecretKeyToGenerateJwts";
 	

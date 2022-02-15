@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.organization.projectManagement.entity.ProjectEntity;
 import com.organization.projectManagement.entity.User;
 import com.organization.projectManagement.model.request.ProjectRequest;
-import com.organization.projectManagement.model.response.ProjectResponse;
 import com.organization.projectManagement.repo.ProjectRepository;
 import com.organization.projectManagement.repo.UserRepository;
 
@@ -19,10 +18,9 @@ public class ProjectService {
 	@Autowired
 	private UserRepository userRepo;
 	
-	public ProjectResponse saveOrUpdateProejct(ProjectRequest request, String username) {
+	public String saveOrUpdateProejct(ProjectRequest request, String username) {
 		
 		int status = 1;
-		ProjectResponse response = new ProjectResponse();
 		
 		try {
 			
@@ -44,26 +42,12 @@ public class ProjectService {
 			project.setStatus(status);
 			
 			projectRepo.save(project);
-			response = getResponse(project);
 			
-			return response;
-			
+			return "Project created";
 		}catch(Exception e) {
 			System.out.println(e);
 			return null;
 		}
-	}
-
-	private ProjectResponse getResponse(ProjectEntity project) {
-		
-		ProjectResponse response = new ProjectResponse();
-		
-		response.setProjectName(project.getProjectName());
-		response.setProjectType(project.getProjectTeamType());
-		response.setLeadBy(project.getProjectLeader());
-		response.setProjectAvatar("null");
-		
-		return response;
 	}
 
 }

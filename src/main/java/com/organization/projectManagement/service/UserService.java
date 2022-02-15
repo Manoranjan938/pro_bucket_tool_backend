@@ -15,6 +15,7 @@ import com.organization.projectManagement.entity.AuthProvider;
 import com.organization.projectManagement.entity.User;
 import com.organization.projectManagement.exception.UserAlreadyExistException;
 import com.organization.projectManagement.exception.UserNotFoundException;
+import com.organization.projectManagement.model.request.UpdateUserRequest;
 import com.organization.projectManagement.repo.UserRepository;
 
 import net.bytebuddy.utility.RandomString;
@@ -50,6 +51,29 @@ public class UserService {
 		}catch(Exception e) {
 			throw new UserAlreadyExistException("User with '" + user.getEmail() + "' already exist.");
 		}
+	}
+	
+	
+	public String updateUser(UpdateUserRequest request) {
+		
+		try {
+			
+			User user = userRepo.findById(request.getUserId()).get();
+			
+			if(user != null) {
+				user.setName(request.getName());
+				user.setPhone(request.getPhone());
+				
+				userRepo.save(user);
+				
+				return "User updated successfully";
+			}
+			
+		}catch(Exception e) {
+			throw new UserNotFoundException("User not found");
+		}
+		
+		return null;
 	}
 	
 	

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.organization.projectManagement.model.request.ProjectRequest;
-import com.organization.projectManagement.model.response.ProjectResponse;
 import com.organization.projectManagement.service.ProjectService;
 import com.organization.projectManagement.service.ValidationErrorService;
 
@@ -40,9 +39,9 @@ public class ProjectController {
 			return errorMap;
 		}
 		
-		ProjectResponse project = projectService.saveOrUpdateProejct(request, principal.getName());
+		String project = projectService.saveOrUpdateProejct(request, principal.getName());
 		
-		return new ResponseEntity<ProjectResponse>(project, HttpStatus.CREATED);
+		return new ResponseEntity<String>(project, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/getProjects")

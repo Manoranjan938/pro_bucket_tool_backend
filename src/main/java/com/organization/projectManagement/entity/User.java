@@ -30,11 +30,14 @@ public class User implements UserDetails {
 	
 	private String username;
 	
+	@NotNull(message = "Please fill out this field.")
 	private String name;
 	
 	@Column(nullable = false)
 	@NotNull(message = "Please fill out this field")
 	private String email;
+	
+	private String phone;
 	
 	private String imageUrl;
 	
@@ -159,6 +162,14 @@ public class User implements UserDetails {
 
 	public void setResetPasswordToken(String resetPasswordToken) {
 		this.resetPasswordToken = resetPasswordToken;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	@Override
