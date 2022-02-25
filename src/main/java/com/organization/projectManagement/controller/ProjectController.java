@@ -1,6 +1,7 @@
 package com.organization.projectManagement.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.organization.projectManagement.model.request.ProjectRequest;
+import com.organization.projectManagement.model.response.ProjectResponse;
 import com.organization.projectManagement.service.ProjectService;
 import com.organization.projectManagement.service.ValidationErrorService;
 
@@ -47,7 +49,9 @@ public class ProjectController {
 	@GetMapping("/getProjects")
 	public ResponseEntity<?> getAllProjects(){
 		
-		return null;
+		List<ProjectResponse> projects = projectService.getAllProjects();
+		
+		return new ResponseEntity<List<ProjectResponse>>(projects, HttpStatus.OK);
 		
 	}
 	

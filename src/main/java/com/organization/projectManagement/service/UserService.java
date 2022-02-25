@@ -64,6 +64,7 @@ public class UserService {
 			if (user != null) {
 				user.setName(request.getName());
 				user.setPhone(request.getPhone());
+				user.setEmail(request.getEmail());
 
 				userRepo.save(user);
 
@@ -105,7 +106,7 @@ public class UserService {
 			User user = userRepo.findById(requestPwd.getUserId()).get();
 			if(user != null) {
 				updatePassword(user, requestPwd.getPassword());
-				sendPasswordChangeEmail(user.getEmail());
+				sendPasswordChangeEmail(user.getEmail(), user.getName());
 				
 				return "Password updated successfully";
 			}
@@ -161,7 +162,7 @@ public class UserService {
 	private void sendEmailWithForgotPwdLink(String email, String token)
 			throws UnsupportedEncodingException, MessagingException {
 
-		String resetPassLink = "http://localhost:9025/reset-password?token=" + token;
+		String resetPassLink = "https://localhost:3002/reset-password?token=" + token;
 
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -182,9 +183,31 @@ public class UserService {
 	}
 	
 	
-	private void sendPasswordChangeEmail(String email) {
+	private void sendPasswordChangeEmail(String email, String name) throws 
+									UnsupportedEncodingException, MessagingException {
 		
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
 		
+		String link = "https://localhost:3002/query";
+		
+		helper.setFrom("contact@probucket.com", "Pro Bucket Team");
+		helper.setTo(email);
+		
+		String subject = "Password change notification";
+		String content = "<p>Hello " + name + ",</p>"
+			+ "<p>This is a confirmation that your Pro Bucket password has been changed successfully.</p>"
+			+ "<p>If you requested the password change, there is no further action needed, and your new Pro Bucket"
+			+ " password is active immediately.</p>"
+			+ "<p>If you have any question or did not request a password change, Please contact us at:</p>"
+			+ "<p><a href=\"https://localhost:3002/query\">" + link + "</a></p>"
+			+ "<p>Thank you,</p>"
+			+ "<p>Team Pro Bucket</p>";
+		
+		helper.setSubject(subject);
+		helper.setText(content);
+		
+		mailSender.send(message);
 		
 	}
 

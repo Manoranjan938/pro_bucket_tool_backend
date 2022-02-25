@@ -1,11 +1,14 @@
 package com.organization.projectManagement.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.organization.projectManagement.entity.ProjectEntity;
 import com.organization.projectManagement.entity.User;
 import com.organization.projectManagement.model.request.ProjectRequest;
+import com.organization.projectManagement.model.response.ProjectResponse;
 import com.organization.projectManagement.repo.ProjectRepository;
 import com.organization.projectManagement.repo.UserRepository;
 
@@ -48,6 +51,19 @@ public class ProjectService {
 			System.out.println(e);
 			return null;
 		}
+	}
+	
+	public List<ProjectResponse> getAllProjects(){
+	
+		List<ProjectEntity> project = projectRepo.findAll();
+		
+		if(!project.isEmpty()) {
+			
+			System.out.println("Hello");
+			
+		}
+		
+		return null;
 	}
 
 }

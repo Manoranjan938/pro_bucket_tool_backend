@@ -34,6 +34,8 @@ public class ProjectEntity {
 	
 	private String projectLeader;
 	
+	private String projectImage;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private User user;
@@ -130,6 +132,14 @@ public class ProjectEntity {
 
 	public void setProjectLeader(String projectLeader) {
 		this.projectLeader = projectLeader;
+	}
+
+	public String getProjectImage() {
+		return projectImage;
+	}
+
+	public void setProjectImage(String projectImage) {
+		this.projectImage = projectImage;
 	}
 
 	@PrePersist

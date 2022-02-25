@@ -6,6 +6,8 @@ public class UpdateUserRequest {
 
 	private String name;
 	
+	private String email;
+	
 	private String phone;
 
 	public Long getUserId() {
@@ -30,6 +32,14 @@ public class UpdateUserRequest {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }
