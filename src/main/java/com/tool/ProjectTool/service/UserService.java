@@ -1,6 +1,7 @@
 package com.tool.ProjectTool.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.UserAlreadyExistException;
@@ -9,6 +10,7 @@ import com.tool.ProjectTool.model.request.UpdateUserRequest;
 import com.tool.ProjectTool.model.response.UserResponse;
 import com.tool.ProjectTool.repo.UserRepository;
 
+@Service
 public class UserService {
 
 	@Autowired
