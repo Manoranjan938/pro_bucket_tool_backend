@@ -1,12 +1,16 @@
 package com.tool.ProjectTool.service;
 
+import java.security.SecureRandom;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.UserAlreadyExistException;
 import com.tool.ProjectTool.exception.UserNotFoundException;
 import com.tool.ProjectTool.model.request.UpdateUserRequest;
+import com.tool.ProjectTool.model.request.UserRequest;
 import com.tool.ProjectTool.model.response.UserResponse;
 import com.tool.ProjectTool.repo.UserRepository;
 
@@ -15,22 +19,52 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepo;
-	
-	public Users createUser(Users user) {
+
+	@Autowired
+	private BCryptPasswordEncoder passEncode;
+
+	static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	static SecureRandom rnd = new SecureRandom();
+
+	String randomString(int len) {
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++)
+			sb.append(AB.charAt(rnd.nextInt(AB.length())));
+		return sb.toString();
+	}
+
+	public Users createUser(UserRequest user) {
 
 		try {
-			String email = user.getEmail();
+			String email = user.getUsername();
+			String ids = randomString(20);
+			String id = null;
 
 			Users existUser = userRepo.findByUsername(email);
+			Users checkIds = userRepo.findByUserId(ids);
+
 			if (existUser != null) {
 				throw new UserAlreadyExistException("User with '" + email + "' already exist.");
 			}
 
-			user.setUsername(email);
+			Users users = new Users();
 
-			return userRepo.save(user);
+			users.setUsername(email);
+			users.setEmail(email);
+
+			if (checkIds != null) {
+				id = randomString(20);
+			} else {
+				id = ids;
+			}
+			users.setUserId(id);
+			users.setRoleName(user.getRoleName());
+			users.setPassword(passEncode.encode(user.getPassword()));
+			users.setStatus(0);
+
+			return userRepo.save(users);
 		} catch (Exception e) {
-			throw new UserAlreadyExistException("User with '" + user.getEmail() + "' already exist.");
+			throw new UserAlreadyExistException("User with '" + user.getUsername() + "' already exist.");
 		}
 	}
 
@@ -65,11 +99,11 @@ public class UserService {
 			UserResponse uRes = new UserResponse();
 
 			if (user != null) {
-				
+
 				uRes.setUserName(user.getName());
 				uRes.setUserEmail(user.getEmail());
 				uRes.setUserPic(user.getImageUrl());
-				
+
 				return uRes;
 			}
 			throw new UserNotFoundException("User not found");

@@ -18,7 +18,9 @@ public class ProjectEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long projectId;
+	private Long id;
+	
+	private String projectId;
 	
 	private String projectName;
 	
@@ -44,19 +46,19 @@ public class ProjectEntity {
 	
 	private Date updatedAt;
 
-	public Users getUser() {
-		return user;
+	public Long getId() {
+		return id;
 	}
 
-	public void setUser(Users user) {
-		this.user = user;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public Long getProjectId() {
+	public String getProjectId() {
 		return projectId;
 	}
 
-	public void setProjectId(Long projectId) {
+	public void setProjectId(String projectId) {
 		this.projectId = projectId;
 	}
 
@@ -116,6 +118,14 @@ public class ProjectEntity {
 		this.projectImage = projectImage;
 	}
 
+	public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
+	}
+
 	public int getStatus() {
 		return status;
 	}
@@ -139,5 +149,5 @@ public class ProjectEntity {
 	public void setUpdatedAt(Date updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	
+
 }

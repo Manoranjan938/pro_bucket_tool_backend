@@ -16,6 +16,8 @@ public class Notification {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	private String notificationId;
+	
 	private String notificationTitle;
 	
 	private String notificationDescription;
@@ -38,6 +40,14 @@ public class Notification {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getNotificationId() {
+		return notificationId;
+	}
+
+	public void setNotificationId(String notificationId) {
+		this.notificationId = notificationId;
 	}
 
 	public String getNotificationTitle() {

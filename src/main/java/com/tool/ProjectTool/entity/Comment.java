@@ -16,6 +16,8 @@ public class Comment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	private String commentId;
+	
 	private String username;
 	
 	private Long commentBy;
@@ -46,6 +48,14 @@ public class Comment {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getCommentId() {
+		return commentId;
+	}
+
+	public void setCommentId(String commentId) {
+		this.commentId = commentId;
 	}
 
 	public String getUsername() {
