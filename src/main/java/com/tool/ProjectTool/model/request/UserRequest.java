@@ -12,6 +12,9 @@ public class UserRequest {
 	@NotBlank
 	private String password;
 	
+	@NotBlank
+	private String name;
+	
 	private String roleName;
 
 	public String getUsername() {
@@ -36,6 +39,14 @@ public class UserRequest {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 }

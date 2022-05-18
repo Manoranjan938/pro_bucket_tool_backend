@@ -1,6 +1,5 @@
 package com.tool.ProjectTool.controller;
 
-import java.security.Principal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -10,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,26 +31,33 @@ public class ProjectController {
 	private ValidationErrorService errorService;
 	
 	@PostMapping("/createProject")
-	public ResponseEntity<?> createNewProject(@Valid @RequestBody ProjectRequest request, BindingResult result, 
-											Principal principal){
+	public ResponseEntity<?> createNewProject(@Valid @RequestBody ProjectRequest request, BindingResult result){
 		
 		ResponseEntity<?> errorMap = errorService.mapValidationError(result);
 		if(errorMap != null) {
 			return errorMap;
 		}
 		
-		String project = projectService.saveOrUpdateProejct(request, principal.getName());
+		String project = projectService.saveOrUpdateProejct(request);
 		
 		return new ResponseEntity<String>(project, HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/getProjects")
-	public ResponseEntity<?> getAllProjects(){
+	@GetMapping("/getProjects/{userId}")
+	public ResponseEntity<?> getAllProjects(@PathVariable("userId") int userId){
 		
-		List<ProjectResponse> projects = projectService.getAllProjects();
+		List<ProjectResponse> projects = projectService.getAllProjects(userId);
 		
 		return new ResponseEntity<List<ProjectResponse>>(projects, HttpStatus.OK);
 		
+	}
+	
+	@GetMapping("/getProject/{projectId}")
+	public ResponseEntity<?> getAllProjects(@PathVariable("projectId") String projectId){
+		
+		ProjectResponse project = projectService.getProjectById(projectId);
+		
+		return new ResponseEntity<ProjectResponse>(project, HttpStatus.OK);
 	}
 	
 }

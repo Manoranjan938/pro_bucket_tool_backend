@@ -51,6 +51,7 @@ public class UserService {
 
 			users.setUsername(email);
 			users.setEmail(email);
+			users.setName(user.getName());
 
 			if (checkIds != null) {
 				id = randomString(20);
@@ -91,18 +92,20 @@ public class UserService {
 		return null;
 	}
 
-	public UserResponse getUserDetails(long userId) {
+	public UserResponse getUserDetails(String email) {
 
 		try {
 
-			Users user = userRepo.findById(userId).get();
+			Users user = userRepo.findByUsername(email);
 			UserResponse uRes = new UserResponse();
 
 			if (user != null) {
 
-				uRes.setUserName(user.getName());
+				uRes.setName(user.getName());
 				uRes.setUserEmail(user.getEmail());
 				uRes.setUserPic(user.getImageUrl());
+				uRes.setUserId(user.getUserId());
+				uRes.setUserRole(user.getRoleName());
 
 				return uRes;
 			}

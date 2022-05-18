@@ -18,6 +18,8 @@ public class ProjectRequest {
 	private String projectType;
 	
 	private String accessType;
+	
+	private String userId;
 
 	public String getProjectName() {
 		return projectName;
@@ -49,6 +51,14 @@ public class ProjectRequest {
 
 	public void setAccessType(String accessType) {
 		this.accessType = accessType;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public ProjectRequest() {

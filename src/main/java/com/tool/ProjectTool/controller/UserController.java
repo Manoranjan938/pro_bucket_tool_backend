@@ -21,10 +21,10 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("/me/{userId}")
-	public ResponseEntity<?> getUserDetails(@PathVariable("userId") long userId){
+	@GetMapping("/me/{email}")
+	public ResponseEntity<?> getUserDetails(@PathVariable("email") String email){
 		
-		UserResponse userDetails = userService.getUserDetails(userId);
+		UserResponse userDetails = userService.getUserDetails(email);
 		
 		return new ResponseEntity<UserResponse>(userDetails, HttpStatus.OK);
 	}

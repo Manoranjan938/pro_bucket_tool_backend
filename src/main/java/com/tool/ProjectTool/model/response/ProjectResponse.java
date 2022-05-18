@@ -2,12 +2,14 @@ package com.tool.ProjectTool.model.response;
 
 public class ProjectResponse {
 
-private String projectName;
+	private String projectName;
 	
+	private String projectId;
+
 	private String leadBy;
-	
+
 	private String projectType;
-	
+
 	private String projectAvatar;
 
 	public String getProjectName() {
@@ -41,5 +43,13 @@ private String projectName;
 	public void setProjectAvatar(String projectAvatar) {
 		this.projectAvatar = projectAvatar;
 	}
-	
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
 }
