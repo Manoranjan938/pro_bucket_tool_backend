@@ -106,7 +106,7 @@
             <h1>Password Reset Request</h1>
             <p>Dear ProBucket user,</p>
             <p>We have received your request to change your password. Please click the below button to complete the change</p>
-            <a href="http://mycareerbuild.co.in:3006/reset-password">
+            <a href="https://localhost:3002/reset-password?token=${token}">
               <button type="button" name="button" class="pwd_btn">Change my password</button>
             </a>
         </div>

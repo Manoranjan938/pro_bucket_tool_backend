@@ -1,18 +1,32 @@
 package com.tool.ProjectTool.service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.UserAlreadyExistException;
 import com.tool.ProjectTool.exception.UserNotFoundException;
 import com.tool.ProjectTool.model.request.UpdateUserRequest;
 import com.tool.ProjectTool.model.request.UserRequest;
+import com.tool.ProjectTool.model.response.EmailResponse;
 import com.tool.ProjectTool.model.response.UserResponse;
 import com.tool.ProjectTool.repo.UserRepository;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import net.bytebuddy.utility.RandomString;
 
 @Service
 public class UserService {
@@ -22,6 +36,12 @@ public class UserService {
 
 	@Autowired
 	private BCryptPasswordEncoder passEncode;
+	
+	@Autowired
+	private JavaMailSender mailSender;
+
+	@Autowired
+	private Configuration config;
 
 	static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	static SecureRandom rnd = new SecureRandom();
@@ -60,6 +80,7 @@ public class UserService {
 			}
 			users.setUserId(id);
 			users.setRoleName(user.getRoleName());
+			users.setEmailVerified(false);
 			users.setPassword(passEncode.encode(user.getPassword()));
 			users.setStatus(0);
 
@@ -113,5 +134,82 @@ public class UserService {
 		} catch (Exception e) {
 			throw new UserNotFoundException("User not found");
 		}
+	}
+	
+	public String requestResetPssword(String email) {
+		
+		Users user = userRepo.findByEmail(email);
+		
+		if(user != null) {
+			
+			String token = RandomString.make(70);
+			
+			user.setVerifyToken(token);
+			userRepo.save(user);
+			sendPasswordChangeRequestEmail(email, token);
+			
+			return "Email sended";
+		}
+		
+		throw new UserNotFoundException("User not found with this email" + email);
+	}
+	
+	
+	public String resetPassword(String token, String pass) {
+		
+		Users user = userRepo.findByVerifyToken(token);
+		
+		if(user != null) {
+			
+			user.setVerifyToken(null);
+			user.setPassword(passEncode.encode(pass));
+			
+			userRepo.save(user);
+			
+			return "Password updated successdully";
+		}
+		
+		throw new UserNotFoundException("User does not exist or invalid token");
+	}
+	
+	
+	public EmailResponse sendPasswordChangeRequestEmail(String email, String token) {
+
+		EmailResponse response = new EmailResponse();
+		MimeMessage message = mailSender.createMimeMessage();
+
+		Map<String, Object> model = new HashMap<>();
+
+		try {
+
+			MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+					StandardCharsets.UTF_8.name());
+
+			// helper.addAttachment("logo.png", new ClassPathResource("/static/logo.png"));
+
+			model.put("token", token);
+
+			Template t = config.getTemplate("password-change-template.ftl");
+			String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
+
+			helper.setTo(email);
+			helper.setText(html, true);
+			helper.setSubject("Complete your password reset request");
+			helper.setFrom("probucket@info.co.in");
+			helper.addInline("logo.png", new ClassPathResource("logo.png"));
+
+			mailSender.send(message);
+
+			response.setMessage("Mail send to: " + email + " and successfuly requested.");
+			response.setStatus(true);
+
+		} catch (Exception e) {
+			response.setMessage(
+					"Mail Sending failure " + e.getMessage() + " and something went wrong while requesting.");
+			response.setStatus(false);
+		}
+
+		return response;
+
 	}
 }

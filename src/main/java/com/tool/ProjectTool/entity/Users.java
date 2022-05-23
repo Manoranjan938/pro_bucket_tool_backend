@@ -43,6 +43,11 @@ public class Users implements UserDetails {
 	private String roleName;
 	
 	private String password;
+	
+	@Column(nullable = false)
+	private boolean emailVerified;
+	
+	private String verifyToken;
 
 	public Users() {
 		super();
@@ -126,6 +131,22 @@ public class Users implements UserDetails {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public boolean isEmailVerified() {
+		return emailVerified;
+	}
+
+	public void setEmailVerified(boolean emailVerified) {
+		this.emailVerified = emailVerified;
+	}
+
+	public String getVerifyToken() {
+		return verifyToken;
+	}
+
+	public void setVerifyToken(String verifyToken) {
+		this.verifyToken = verifyToken;
 	}
 
 	@Override
