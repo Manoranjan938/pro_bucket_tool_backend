@@ -76,10 +76,11 @@ public class ProjectService {
 		}
 	}
 
-	public List<ProjectResponse> getAllProjects(int userId) {
+	public List<ProjectResponse> getAllProjects(String userId) {
 
-		List<ProjectEntity> project = projectRepo.getProjectsByUserId(userId);
-		List<ProjectResponse> projectList = new ArrayList<ProjectResponse>();
+		Users user = userRepo.findByUserId(userId);
+		List<ProjectEntity> project = projectRepo.getProjectsByUserId(user.getId());
+		List<ProjectResponse> projectList = new ArrayList<>();
 
 		if (!project.isEmpty()) {
 

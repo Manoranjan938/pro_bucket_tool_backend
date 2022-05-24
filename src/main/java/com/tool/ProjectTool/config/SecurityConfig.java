@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests().antMatchers(SecurityConstants.SIGN_UP_URLS).permitAll();
 		//http.authorizeRequests().antMatchers("/api/home/**").hasAuthority("ROLE_USER");
-		http.authorizeRequests().antMatchers("/api/v1/project/**").authenticated();
+		//http.authorizeRequests().antMatchers("/api/v1/project/**").authenticated();
 		http.addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 

@@ -14,6 +14,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 	public ProjectEntity findByProjectId(String id);
 
 	@Query(value = "select * from projects p where user_id =:userId", nativeQuery = true)
-	public List<ProjectEntity> getProjectsByUserId(int userId);
+	public List<ProjectEntity> getProjectsByUserId(long userId);
 
 }
