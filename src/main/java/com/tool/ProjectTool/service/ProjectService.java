@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tool.ProjectTool.entity.Backlog;
 import com.tool.ProjectTool.entity.ProjectEntity;
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.UserNotFoundException;
@@ -33,8 +34,26 @@ public class ProjectService {
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
 	}
+	
+	static String firstLetterWord(String str) {
+		String result = "";
 
-	public String saveOrUpdateProejct(ProjectRequest request) {
+		boolean v = true;
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i) == ' ') {
+				v = true;
+			}
+
+			else if (str.charAt(i) != ' ' && v == true) {
+				result += (str.charAt(i));
+				v = false;
+			}
+		}
+
+		return result;
+	}
+
+	public String saveProject(ProjectRequest request) {
 
 		int status = 1;
 		String ids = randomString(20);
@@ -46,13 +65,21 @@ public class ProjectService {
 			ProjectEntity checkId = projectRepo.findByProjectId(ids);
 
 			ProjectEntity project = new ProjectEntity();
+			Backlog backlog = new Backlog();
 
 			project.setUser(user);
 			project.setProjectLeader(user.getName());
 			project.setProjectName(request.getProjectName());
 			project.setProjectTeamType(request.getProjectType());
 			project.setProjectTemplateType(request.getProjectTemplate());
-
+			
+			String letters = firstLetterWord(request.getProjectName());
+			
+			project.setProjectIdentifier(letters);
+			project.setBacklog(backlog);
+			backlog.setProject(project);
+			backlog.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+			
 			if (request.getProjectType().equalsIgnoreCase("personal")) {
 				project.setProjectAccessType("Private");
 			}
@@ -113,6 +140,7 @@ public class ProjectService {
 			response.setLeadBy(project.getProjectLeader());
 			response.setProjectAvatar(project.getProjectImage());
 			response.setProjectId(project.getProjectId());
+			response.setProjectIdentifier(project.getProjectIdentifier());
 			
 			return response;
 		}

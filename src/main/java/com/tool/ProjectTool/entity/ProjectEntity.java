@@ -2,12 +2,14 @@ package com.tool.ProjectTool.entity;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -38,9 +40,14 @@ public class ProjectEntity {
 	
 	private String projectImage;
 	
+	private String projectIdentifier;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private Users user;
+	
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "project")
+	private Backlog backlog;
 	
 	private int status;
 	
@@ -152,6 +159,22 @@ public class ProjectEntity {
 		this.updatedAt = updatedAt;
 	}
 	
+	public String getProjectIdentifier() {
+		return projectIdentifier;
+	}
+
+	public void setProjectIdentifier(String projectIdentifier) {
+		this.projectIdentifier = projectIdentifier;
+	}
+
+	public Backlog getBacklog() {
+		return backlog;
+	}
+
+	public void setBacklog(Backlog backlog) {
+		this.backlog = backlog;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = new Date();

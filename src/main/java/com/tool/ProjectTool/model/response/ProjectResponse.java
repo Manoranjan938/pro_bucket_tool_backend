@@ -5,6 +5,8 @@ public class ProjectResponse {
 	private String projectName;
 	
 	private String projectId;
+	
+	private String projectIdentifier;
 
 	private String leadBy;
 
@@ -50,6 +52,14 @@ public class ProjectResponse {
 
 	public void setProjectId(String projectId) {
 		this.projectId = projectId;
+	}
+
+	public String getProjectIdentifier() {
+		return projectIdentifier;
+	}
+
+	public void setProjectIdentifier(String projectIdentifier) {
+		this.projectIdentifier = projectIdentifier;
 	}
 
 }
