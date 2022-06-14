@@ -72,6 +72,7 @@ public class ProjectService {
 			project.setProjectName(request.getProjectName());
 			project.setProjectTeamType(request.getProjectType());
 			project.setProjectTemplateType(request.getProjectTemplate());
+			project.setProjectRole("Project Leader");
 			
 			String letters = firstLetterWord(request.getProjectName());
 			
@@ -79,6 +80,7 @@ public class ProjectService {
 			project.setBacklog(backlog);
 			backlog.setProject(project);
 			backlog.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+			
 			
 			if (request.getProjectType().equalsIgnoreCase("personal")) {
 				project.setProjectAccessType("Private");

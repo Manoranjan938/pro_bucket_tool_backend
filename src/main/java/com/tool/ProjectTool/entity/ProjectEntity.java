@@ -42,6 +42,8 @@ public class ProjectEntity {
 	
 	private String projectIdentifier;
 	
+	private String projectRole;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private Users user;
@@ -173,6 +175,14 @@ public class ProjectEntity {
 
 	public void setBacklog(Backlog backlog) {
 		this.backlog = backlog;
+	}
+
+	public String getProjectRole() {
+		return projectRole;
+	}
+
+	public void setProjectRole(String projectRole) {
+		this.projectRole = projectRole;
 	}
 
 	@PrePersist

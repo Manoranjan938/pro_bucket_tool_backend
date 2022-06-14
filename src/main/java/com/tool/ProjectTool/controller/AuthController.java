@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.model.request.LoginRequest;
 import com.tool.ProjectTool.model.request.UserRequest;
 import com.tool.ProjectTool.model.response.LoginResponse;
@@ -30,7 +29,7 @@ import com.tool.ProjectTool.service.ValidationErrorService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin({"https://localhost:3002"})
+@CrossOrigin({ "https://localhost:3002" })
 public class AuthController {
 
 	@Autowired
@@ -48,18 +47,14 @@ public class AuthController {
 	@PostMapping("/newUser")
 	public ResponseEntity<?> createLocalUser(@Valid @RequestBody UserRequest user, BindingResult result) {
 
-		try {
-			ResponseEntity<?> errorMap = errorService.mapValidationError(result);
-			if (errorMap != null) {
-				return errorMap;
-			}
-
-			Users user1 = userService.createUser(user);
-
-			return new ResponseEntity<Users>(user1, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<String>("", HttpStatus.INTERNAL_SERVER_ERROR);
+		ResponseEntity<?> errorMap = errorService.mapValidationError(result);
+		if (errorMap != null) {
+			return errorMap;
 		}
+
+		String user1 = userService.createUser(user);
+
+		return new ResponseEntity<String>(user1, HttpStatus.CREATED);
 	}
 
 	@PostMapping("/login")
@@ -73,18 +68,26 @@ public class AuthController {
 		return ResponseEntity.ok(new LoginResponse(true, jwt));
 	}
 
+	@GetMapping("/verify")
+	public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
+
+		String mess = userService.verifyUser(token);
+
+		return new ResponseEntity<String>(mess, HttpStatus.OK);
+	}
+
 	@GetMapping("/requestPasswordChange/{email}")
 	public ResponseEntity<String> requestPasswordChange(@PathVariable("email") String email) {
 
 		String message = userService.requestResetPssword(email);
 		return new ResponseEntity<String>(message, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/resetPassword")
-	public ResponseEntity<?> updatePassword(@RequestParam("token") String token, @RequestParam("pass") String pass){
-		
+	public ResponseEntity<?> updatePassword(@RequestParam("token") String token, @RequestParam("pass") String pass) {
+
 		String message = userService.resetPassword(token, pass);
-		
+
 		return new ResponseEntity<String>(message, HttpStatus.OK);
 	}
 

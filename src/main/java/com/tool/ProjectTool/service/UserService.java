@@ -36,7 +36,7 @@ public class UserService {
 
 	@Autowired
 	private BCryptPasswordEncoder passEncode;
-	
+
 	@Autowired
 	private JavaMailSender mailSender;
 
@@ -53,41 +53,64 @@ public class UserService {
 		return sb.toString();
 	}
 
-	public Users createUser(UserRequest user) {
+	public String createUser(UserRequest user) {
 
 		try {
 			String email = user.getUsername();
 			String ids = randomString(20);
 			String id = null;
 
-			Users existUser = userRepo.findByUsername(email);
+			Users existUser = userRepo.findByEmail(email);
 			Users checkIds = userRepo.findByUserId(ids);
 
-			if (existUser != null) {
-				throw new UserAlreadyExistException("User with '" + email + "' already exist.");
+			if (existUser == null) {
+				Users users = new Users();
+
+				users.setUsername(email);
+				users.setEmail(email);
+				users.setName(user.getName());
+
+				if (checkIds != null) {
+					id = randomString(20);
+				} else {
+					id = ids;
+				}
+				users.setUserId(id);
+				users.setRoleName(user.getRoleName());
+				users.setEmailVerified(false);
+				users.setPassword(passEncode.encode(user.getPassword()));
+				users.setStatus(0);
+				String token = RandomString.make(80);
+				users.setVerifyToken(token);
+
+				userRepo.save(users);
+				sendRegistrationConfirmationEmail(user.getUsername(), token);
+
+				return "User Added successfully";
+
 			}
 
-			Users users = new Users();
-
-			users.setUsername(email);
-			users.setEmail(email);
-			users.setName(user.getName());
-
-			if (checkIds != null) {
-				id = randomString(20);
-			} else {
-				id = ids;
-			}
-			users.setUserId(id);
-			users.setRoleName(user.getRoleName());
-			users.setEmailVerified(false);
-			users.setPassword(passEncode.encode(user.getPassword()));
-			users.setStatus(0);
-
-			return userRepo.save(users);
+			throw new UserAlreadyExistException("User with '" + email + "' already exist.");
 		} catch (Exception e) {
 			throw new UserAlreadyExistException("User with '" + user.getUsername() + "' already exist.");
 		}
+	}
+
+	public String verifyUser(String token) {
+
+		Users user = userRepo.findByVerifyToken(token);
+
+		if (user != null) {
+
+			user.setVerifyToken(null);
+			user.setEmailVerified(true);
+
+			userRepo.save(user);
+
+			return "User verified successdully";
+		}
+
+		throw new UserNotFoundException("User does not exist or invalid token");
 	}
 
 	public String updateUser(UpdateUserRequest request) {
@@ -135,44 +158,82 @@ public class UserService {
 			throw new UserNotFoundException("User not found");
 		}
 	}
-	
+
 	public String requestResetPssword(String email) {
-		
+
 		Users user = userRepo.findByEmail(email);
-		
-		if(user != null) {
-			
+
+		if (user != null) {
+
 			String token = RandomString.make(70);
-			
+
 			user.setVerifyToken(token);
 			userRepo.save(user);
 			sendPasswordChangeRequestEmail(email, token);
-			
+
 			return "Email sended";
 		}
-		
+
 		throw new UserNotFoundException("User not found with this email" + email);
 	}
-	
-	
+
 	public String resetPassword(String token, String pass) {
-		
+
 		Users user = userRepo.findByVerifyToken(token);
-		
-		if(user != null) {
-			
+
+		if (user != null) {
+
 			user.setVerifyToken(null);
 			user.setPassword(passEncode.encode(pass));
-			
+
 			userRepo.save(user);
-			
+
 			return "Password updated successdully";
 		}
-		
+
 		throw new UserNotFoundException("User does not exist or invalid token");
 	}
-	
-	
+
+	public EmailResponse sendRegistrationConfirmationEmail(String email, String token) {
+
+		EmailResponse response = new EmailResponse();
+		MimeMessage message = mailSender.createMimeMessage();
+
+		Map<String, Object> model = new HashMap<>();
+
+		try {
+
+			MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+					StandardCharsets.UTF_8.name());
+
+			// helper.addAttachment("logo.png", new ClassPathResource("/static/logo.png"));
+
+			model.put("token", token);
+
+			Template t = config.getTemplate("registration-confirmation-template.ftl");
+			String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
+
+			helper.setTo(email);
+			helper.setText(html, true);
+			helper.setSubject("Verify email request");
+			helper.setFrom("probucket@info.co.in");
+			helper.addInline("logo.png", new ClassPathResource("logo.png"));
+
+			mailSender.send(message);
+
+			response.setMessage("Mail send to: " + email + " and successfuly requested.");
+			response.setStatus(true);
+
+		} catch (Exception e) {
+			response.setMessage(
+					"Mail Sending failure " + e.getMessage() + " and something went wrong while requesting.");
+			response.setStatus(false);
+		}
+
+		return response;
+
+	}
+
 	public EmailResponse sendPasswordChangeRequestEmail(String email, String token) {
 
 		EmailResponse response = new EmailResponse();
