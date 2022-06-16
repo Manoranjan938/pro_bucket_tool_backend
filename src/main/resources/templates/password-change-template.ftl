@@ -33,6 +33,8 @@
             font-weight: 600;
             font-family: Arial, Helvetica, sans-serif;
             color: #827ED8;
+            display: flex;
+            align-items: center!important;
         }
 
         .icon{
@@ -43,9 +45,6 @@
             justify-content: center;
             align-items: center;
             color: #fff;
-        }
-        .icon > i{
-            font-size: 50px;
         }
         .contents{
             margin: 40px;

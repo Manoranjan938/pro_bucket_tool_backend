@@ -44,6 +44,8 @@ public class ProjectTask {
 	@Column(updatable = false)
 	private String projectIdentifier;
 	
+	private String sprintId;
+	
 	private Date createdAt;
 	
 	private Date updatedAt;
@@ -126,6 +128,14 @@ public class ProjectTask {
 
 	public void setBacklog(Backlog backlog) {
 		this.backlog = backlog;
+	}
+
+	public String getSprintId() {
+		return sprintId;
+	}
+
+	public void setSprintId(String sprintId) {
+		this.sprintId = sprintId;
 	}
 
 	@PrePersist

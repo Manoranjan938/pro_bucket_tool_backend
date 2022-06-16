@@ -49,6 +49,7 @@ public class ProjectTaskService {
 
 			projTask.setPriority(request.getPriority());
 			projTask.setTaskDesc(request.getTaskName());
+			projTask.setSprintId(request.getSprintId());
 
 			projectTaskRepo.save(projTask);
 

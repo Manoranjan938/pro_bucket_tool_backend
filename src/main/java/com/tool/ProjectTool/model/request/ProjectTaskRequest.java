@@ -13,6 +13,8 @@ public class ProjectTaskRequest {
 	@NotBlank
 	private String taskName;
 	
+	private String sprintId;
+	
 	private String priority;
 	
 	private String status;
@@ -47,6 +49,14 @@ public class ProjectTaskRequest {
 
 	public void setProjectIdentifier(String projectIdentifier) {
 		this.projectIdentifier = projectIdentifier;
+	}
+
+	public String getSprintId() {
+		return sprintId;
+	}
+
+	public void setSprintId(String sprintId) {
+		this.sprintId = sprintId;
 	}
 	
 }
