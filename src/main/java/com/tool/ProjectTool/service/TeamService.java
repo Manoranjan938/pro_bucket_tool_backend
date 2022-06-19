@@ -98,7 +98,7 @@ public class TeamService {
 
 			// helper.addAttachment("logo.png", new ClassPathResource("/static/logo.png"));
 
-			model.put("secret-string", secretString);
+			model.put("secretString", secretString);
 
 			Template t = config.getTemplate("new-team-member-template.ftl");
 			String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);

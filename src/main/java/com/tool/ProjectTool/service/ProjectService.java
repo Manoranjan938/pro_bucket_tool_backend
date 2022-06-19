@@ -74,9 +74,18 @@ public class ProjectService {
 			project.setProjectTemplateType(request.getProjectTemplate());
 			project.setProjectRole("Project Leader");
 			
+			if(request.getProjectType().equalsIgnoreCase("personal")) {
+				user.setRoleName("ROLE_PERSONAL");
+			}
+			if(request.getProjectType().equalsIgnoreCase("team")) {
+				user.setRoleName("ROLE_TEAM-ADMIN");
+			}
+			
+			userRepo.save(user);
+			
 			String letters = firstLetterWord(request.getProjectName());
 			
-			project.setProjectIdentifier(letters);
+			project.setProjectIdentifier(letters.toUpperCase());
 			project.setBacklog(backlog);
 			backlog.setProject(project);
 			backlog.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
@@ -93,7 +102,7 @@ public class ProjectService {
 			}
 
 			project.setProjectId(id);
-			project.setProjectAccessType(request.getAccessType());
+			project.setProjectDescription(request.getProjectDesc());
 			project.setStatus(status);
 
 			projectRepo.save(project);

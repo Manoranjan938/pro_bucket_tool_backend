@@ -17,7 +17,7 @@ public class ProjectRequest {
 	@Size(min = 1, message = "Project type is required.")
 	private String projectType;
 	
-	private String accessType;
+	private String projectDesc;
 	
 	private String userId;
 
@@ -45,12 +45,12 @@ public class ProjectRequest {
 		this.projectType = projectType;
 	}
 
-	public String getAccessType() {
-		return accessType;
+	public String getProjectDesc() {
+		return projectDesc;
 	}
 
-	public void setAccessType(String accessType) {
-		this.accessType = accessType;
+	public void setProjectDesc(String projectDesc) {
+		this.projectDesc = projectDesc;
 	}
 
 	public String getUserId() {

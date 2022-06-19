@@ -36,6 +36,12 @@ public class ProjectTask {
 	
 	private Date dueDate;
 	
+	private String taskType;
+	
+	private boolean subtask;
+	
+	private String parentTaskId;
+	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
 	@JoinColumn(name = "backlog_id", updatable = false, nullable = false)
 	@JsonIgnore
@@ -136,6 +142,30 @@ public class ProjectTask {
 
 	public void setSprintId(String sprintId) {
 		this.sprintId = sprintId;
+	}
+
+	public String getTaskType() {
+		return taskType;
+	}
+
+	public void setTaskType(String taskType) {
+		this.taskType = taskType;
+	}
+
+	public boolean isSubtask() {
+		return subtask;
+	}
+
+	public void setSubtask(boolean subtask) {
+		this.subtask = subtask;
+	}
+
+	public String getParentTaskId() {
+		return parentTaskId;
+	}
+
+	public void setParentTaskId(String parentTaskId) {
+		this.parentTaskId = parentTaskId;
 	}
 
 	@PrePersist

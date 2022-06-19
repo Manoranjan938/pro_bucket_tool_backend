@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tool.ProjectTool.model.request.ProjectTaskRequest;
+import com.tool.ProjectTool.model.request.UpdateProjectTaskRequest;
 import com.tool.ProjectTool.model.response.TaskDetails;
 import com.tool.ProjectTool.model.response.TaskListResponse;
 import com.tool.ProjectTool.service.ProjectTaskService;
@@ -57,6 +59,12 @@ public class TaskController {
 	public ResponseEntity<?> getTaskDetails(@PathVariable("project_sequence") String taskSeaquenceId) {
 
 		return new ResponseEntity<TaskDetails>(taskService.getTaskDetails(taskSeaquenceId), HttpStatus.OK);
+	}
+	
+	@PutMapping("/updateTask")
+	public ResponseEntity<?> updateProjectTask(@RequestBody UpdateProjectTaskRequest updateTask){
+		
+		return null;
 	}
 
 }
