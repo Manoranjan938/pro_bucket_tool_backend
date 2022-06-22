@@ -5,6 +5,8 @@ import java.util.Date;
 public class TaskDetails {
 
 	private String taskName;
+	
+	private String taskDesc;
 
 	private String taskType;
 
@@ -82,6 +84,14 @@ public class TaskDetails {
 
 	public void setUpdatedOn(Date updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public String getTaskDesc() {
+		return taskDesc;
+	}
+
+	public void setTaskDesc(String taskDesc) {
+		this.taskDesc = taskDesc;
 	}
 
 }

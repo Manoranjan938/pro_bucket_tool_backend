@@ -53,6 +53,10 @@ public class ProjectEntity {
 	
 	private int status;
 	
+	private String deletedBy;
+	
+	private Date deletedDate;
+	
 	private Date createdAt;
 	
 	private Date updatedAt;
@@ -183,6 +187,22 @@ public class ProjectEntity {
 
 	public void setProjectRole(String projectRole) {
 		this.projectRole = projectRole;
+	}
+
+	public String getDeletedBy() {
+		return deletedBy;
+	}
+
+	public void setDeletedBy(String deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+
+	public Date getDeletedDate() {
+		return deletedDate;
+	}
+
+	public void setDeletedDate(Date deletedDate) {
+		this.deletedDate = deletedDate;
 	}
 
 	@PrePersist

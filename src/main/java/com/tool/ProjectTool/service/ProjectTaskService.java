@@ -8,13 +8,16 @@ import org.springframework.stereotype.Service;
 
 import com.tool.ProjectTool.entity.Backlog;
 import com.tool.ProjectTool.entity.ProjectTask;
+import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.ProjectNotFoundException;
 import com.tool.ProjectTool.exception.TaskIdNotFoundException;
 import com.tool.ProjectTool.model.request.ProjectTaskRequest;
+import com.tool.ProjectTool.model.request.UpdateProjectTaskRequest;
 import com.tool.ProjectTool.model.response.TaskDetails;
 import com.tool.ProjectTool.model.response.TaskListResponse;
 import com.tool.ProjectTool.repo.BacklogRepository;
 import com.tool.ProjectTool.repo.ProjectTaskRepository;
+import com.tool.ProjectTool.repo.UserRepository;
 
 @Service
 public class ProjectTaskService {
@@ -24,6 +27,9 @@ public class ProjectTaskService {
 
 	@Autowired
 	private ProjectTaskRepository projectTaskRepo;
+
+	@Autowired
+	private UserRepository userRepo;
 
 	public String addProjectTask(ProjectTaskRequest request) {
 
@@ -48,7 +54,8 @@ public class ProjectTaskService {
 			}
 
 			projTask.setPriority(request.getPriority());
-			projTask.setTaskDesc(request.getTaskName());
+			projTask.setTaskName(request.getTaskName());
+			;
 			projTask.setSprintId(request.getSprintId());
 			projTask.setSubtask(false);
 
@@ -68,7 +75,7 @@ public class ProjectTaskService {
 			for (ProjectTask project : tasks) {
 				TaskListResponse tas = new TaskListResponse();
 
-				tas.setTaskName(project.getTaskDesc());
+				tas.setTaskName(project.getTaskName());
 				tas.setTaskSequence(project.getProjectSequence());
 				tas.setPriority(project.getPriority());
 				tas.setStatus(project.getStatus());
@@ -78,28 +85,51 @@ public class ProjectTaskService {
 
 			return taskLists;
 		}
-		
+
 		throw new TaskIdNotFoundException("Task not found");
-		
+
 	}
 
 	public TaskDetails getTaskDetails(String taskSequence) {
-		
+
 		ProjectTask task = projectTaskRepo.findByProjectSequence(taskSequence);
-		if(task != null) {
-			
+		if (task != null) {
+
 			TaskDetails getTask = new TaskDetails();
-			getTask.setTaskName(task.getTaskDesc());
+			Users user = userRepo.findByUserId(task.getAssignee());
+
+			getTask.setTaskName(task.getTaskName());
+			getTask.setTaskDesc(task.getTaskDesc());
 			getTask.setTaskSequence(task.getProjectSequence());
 			getTask.setPriority(task.getPriority());
+			getTask.setAssignee(user.getName());
 			getTask.setStatus(task.getStatus());
 			getTask.setCreatedOn(task.getCreatedAt());
 			getTask.setUpdatedOn(task.getUpdatedAt());
-			
+
 			return getTask;
 		}
 
 		throw new TaskIdNotFoundException("Task sequence not found");
+	}
+
+	public String updateTask(UpdateProjectTaskRequest updateTask) {
+
+		ProjectTask task = projectTaskRepo.findByProjectSequence(updateTask.getTaskId());
+
+		if (task != null) {
+
+			task.setAssignee(updateTask.getAssignee());
+			task.setPriority(updateTask.getPriority());
+			task.setTaskDesc(updateTask.getDescription());
+			task.setStatus(updateTask.getStatus());
+
+			projectTaskRepo.save(task);
+			return "Task updated successfully";
+
+		}
+
+		throw new TaskIdNotFoundException("Task id not found");
 	}
 
 }

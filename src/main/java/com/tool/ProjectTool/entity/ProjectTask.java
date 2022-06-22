@@ -28,6 +28,8 @@ public class ProjectTask {
 	@Column(updatable = false)
 	private String projectSequence;
 	
+	private String taskName;
+	
 	private String taskDesc;
 	
 	private String priority;
@@ -37,6 +39,8 @@ public class ProjectTask {
 	private Date dueDate;
 	
 	private String taskType;
+	
+	private String assignee;
 	
 	private boolean subtask;
 	
@@ -166,6 +170,22 @@ public class ProjectTask {
 
 	public void setParentTaskId(String parentTaskId) {
 		this.parentTaskId = parentTaskId;
+	}
+
+	public String getTaskName() {
+		return taskName;
+	}
+
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
+
+	public String getAssignee() {
+		return assignee;
+	}
+
+	public void setAssignee(String assignee) {
+		this.assignee = assignee;
 	}
 
 	@PrePersist

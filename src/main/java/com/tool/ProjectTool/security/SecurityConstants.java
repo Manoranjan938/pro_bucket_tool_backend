@@ -10,6 +10,6 @@ public class SecurityConstants {
 
 	public static final String TOKEN_HEADER = "Authorization";
 
-	public static final long TOKEN_EXPIRATION_TIME = 1800_000;
+	public static final long TOKEN_EXPIRATION_TIME = 18000_000;
 
 }

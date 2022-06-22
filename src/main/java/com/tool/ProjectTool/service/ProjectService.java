@@ -2,6 +2,7 @@ package com.tool.ProjectTool.service;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.tool.ProjectTool.entity.Backlog;
 import com.tool.ProjectTool.entity.ProjectEntity;
 import com.tool.ProjectTool.entity.Users;
+import com.tool.ProjectTool.exception.ProjectNotFoundException;
 import com.tool.ProjectTool.exception.UserNotFoundException;
 import com.tool.ProjectTool.model.request.ProjectRequest;
+import com.tool.ProjectTool.model.request.UpdateProjectRequest;
 import com.tool.ProjectTool.model.response.ProjectResponse;
 import com.tool.ProjectTool.repo.ProjectRepository;
 import com.tool.ProjectTool.repo.UserRepository;
@@ -24,7 +27,7 @@ public class ProjectService {
 
 	@Autowired
 	private UserRepository userRepo;
-	
+
 	static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	static SecureRandom rnd = new SecureRandom();
 
@@ -34,7 +37,7 @@ public class ProjectService {
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
 	}
-	
+
 	static String firstLetterWord(String str) {
 		String result = "";
 
@@ -73,28 +76,27 @@ public class ProjectService {
 			project.setProjectTeamType(request.getProjectType());
 			project.setProjectTemplateType(request.getProjectTemplate());
 			project.setProjectRole("Project Leader");
-			
-			if(request.getProjectType().equalsIgnoreCase("personal")) {
+
+			if (request.getProjectType().equalsIgnoreCase("personal")) {
 				user.setRoleName("ROLE_PERSONAL");
 			}
-			if(request.getProjectType().equalsIgnoreCase("team")) {
+			if (request.getProjectType().equalsIgnoreCase("team")) {
 				user.setRoleName("ROLE_TEAM-ADMIN");
 			}
-			
+
 			userRepo.save(user);
-			
+
 			String letters = firstLetterWord(request.getProjectName());
-			
+
 			project.setProjectIdentifier(letters.toUpperCase());
 			project.setBacklog(backlog);
 			backlog.setProject(project);
 			backlog.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
-			
-			
+
 			if (request.getProjectType().equalsIgnoreCase("personal")) {
 				project.setProjectAccessType("Private");
 			}
-			
+
 			if (checkId != null) {
 				id = randomString(20);
 			} else {
@@ -122,15 +124,15 @@ public class ProjectService {
 
 		if (!project.isEmpty()) {
 
-			for(ProjectEntity projects : project) {
+			for (ProjectEntity projects : project) {
 				ProjectResponse response = new ProjectResponse();
-				
+
 				response.setProjectName(projects.getProjectName());
 				response.setProjectType(projects.getProjectTeamType());
 				response.setLeadBy(projects.getProjectLeader());
 				response.setProjectAvatar(projects.getProjectImage());
 				response.setProjectId(projects.getProjectId());
-				
+
 				projectList.add(response);
 			}
 
@@ -138,25 +140,59 @@ public class ProjectService {
 
 		return projectList;
 	}
-	
+
 	public ProjectResponse getProjectById(String id) {
-		
+
 		ProjectEntity project = projectRepo.findByProjectId(id);
-		if(project != null) {
-			
+		if (project != null) {
+
 			ProjectResponse response = new ProjectResponse();
-			
+
 			response.setProjectName(project.getProjectName());
 			response.setProjectType(project.getProjectTeamType());
 			response.setLeadBy(project.getProjectLeader());
 			response.setProjectAvatar(project.getProjectImage());
 			response.setProjectId(project.getProjectId());
 			response.setProjectIdentifier(project.getProjectIdentifier());
-			
+
 			return response;
 		}
-		
+
 		throw new UserNotFoundException("Project not found with id" + id);
+	}
+
+	public String updateProject(UpdateProjectRequest projRequest) {
+
+		ProjectEntity proj = projectRepo.findByProjectId(projRequest.getProjectId());
+
+		if (proj != null) {
+
+			proj.setProjectName(projRequest.getProjectName());
+
+			projectRepo.save(proj);
+			return "Project Updated successfully";
+		}
+
+		throw new ProjectNotFoundException("Project Not found with this project id");
+	}
+
+	public String deleteProject(String projectId, String userId) {
+
+		ProjectEntity proj = projectRepo.findByProjectId(projectId);
+		Users user = userRepo.findByUserId(userId);
+
+		if (proj != null) {
+
+			proj.setStatus(0);
+			proj.setDeletedBy(user.getName());
+			proj.setDeletedDate(new Date());
+
+			projectRepo.save(proj);
+			return "Project deleted successfully";
+		}
+
+		throw new ProjectNotFoundException("Project Not found with this project id");
+
 	}
 
 }
