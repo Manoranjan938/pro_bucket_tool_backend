@@ -1,6 +1,7 @@
 package com.tool.ProjectTool.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.ProjectNotFoundException;
 import com.tool.ProjectTool.exception.TaskIdNotFoundException;
 import com.tool.ProjectTool.model.request.ProjectTaskRequest;
+import com.tool.ProjectTool.model.request.RequestCreateSubtask;
 import com.tool.ProjectTool.model.request.UpdateProjectTaskRequest;
+import com.tool.ProjectTool.model.response.SubtaskList;
 import com.tool.ProjectTool.model.response.TaskDetails;
 import com.tool.ProjectTool.model.response.TaskListResponse;
 import com.tool.ProjectTool.repo.BacklogRepository;
@@ -90,6 +93,30 @@ public class ProjectTaskService {
 
 	}
 
+	public List<SubtaskList> getSubTaskList(String parentId) {
+
+		List<Object> subtaskList = projectTaskRepo.findSubtaskListByParentId(parentId);
+		List<SubtaskList> subtaskLists = new ArrayList<>();
+		Iterator itr = subtaskList.iterator();
+
+		while (itr.hasNext()) {
+			Object[] row = (Object[]) itr.next();
+			SubtaskList sub = new SubtaskList();
+
+			sub.setTaskName(String.valueOf(row[0]));
+			sub.setTaskType(String.valueOf(row[1]));
+			sub.setTaskSequence(String.valueOf(row[2]));
+			sub.setPriority(String.valueOf(row[3]));
+			sub.setStatus(String.valueOf(row[4]));
+			sub.setAssignee(String.valueOf(row[5]));
+
+			subtaskLists.add(sub);
+
+		}
+
+		return subtaskLists;
+	}
+
 	public TaskDetails getTaskDetails(String taskSequence) {
 
 		ProjectTask task = projectTaskRepo.findByProjectSequence(taskSequence);
@@ -98,11 +125,15 @@ public class ProjectTaskService {
 			TaskDetails getTask = new TaskDetails();
 			Users user = userRepo.findByUserId(task.getAssignee());
 
+			if (user != null) {
+				getTask.setAssignee(user.getName());
+			}
+
 			getTask.setTaskName(task.getTaskName());
 			getTask.setTaskDesc(task.getTaskDesc());
 			getTask.setTaskSequence(task.getProjectSequence());
 			getTask.setPriority(task.getPriority());
-			getTask.setAssignee(user.getName());
+			getTask.setAssignee(null);
 			getTask.setStatus(task.getStatus());
 			getTask.setCreatedOn(task.getCreatedAt());
 			getTask.setUpdatedOn(task.getUpdatedAt());
@@ -130,6 +161,45 @@ public class ProjectTaskService {
 		}
 
 		throw new TaskIdNotFoundException("Task id not found");
+	}
+
+	public String createSubtask(RequestCreateSubtask subtaskRequest) {
+
+		try {
+			Backlog back = backlogRepo.findByProjectIdentifier(subtaskRequest.getProjectId());
+
+			ProjectTask projTask = new ProjectTask();
+			projTask.setBacklog(back);
+
+			Integer backlogSequesnce = back.getPTSequence();
+			backlogSequesnce++;
+			back.setPTSequence(backlogSequesnce);
+
+			projTask.setProjectSequence(subtaskRequest.getProjectId() + "-" + backlogSequesnce);
+			projTask.setProjectIdentifier(subtaskRequest.getProjectId());
+
+			if (subtaskRequest.getPriority() == "" || subtaskRequest.getPriority() == null) {
+				projTask.setPriority("LOW");
+			}
+			if (subtaskRequest.getStatus() == "" || subtaskRequest.getStatus() == null) {
+				projTask.setStatus("TODO");
+			}
+
+			projTask.setPriority(subtaskRequest.getPriority());
+			projTask.setTaskName(subtaskRequest.getTaskName());
+			;
+			// projTask.setSprintId(request.getSprintId());
+			projTask.setSubtask(true);
+			projTask.setTaskType("Task");
+			projTask.setParentTaskId(subtaskRequest.getParentTaskId());
+
+			projectTaskRepo.save(projTask);
+
+			return "Task created successfully";
+		} catch (Exception e) {
+			throw new ProjectNotFoundException("Project not found");
+		}
+
 	}
 
 }

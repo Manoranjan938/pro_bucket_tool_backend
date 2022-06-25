@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tool.ProjectTool.model.request.ProjectTaskRequest;
+import com.tool.ProjectTool.model.request.RequestCreateSubtask;
 import com.tool.ProjectTool.model.request.UpdateProjectTaskRequest;
+import com.tool.ProjectTool.model.response.SubtaskList;
 import com.tool.ProjectTool.model.response.TaskDetails;
 import com.tool.ProjectTool.model.response.TaskListResponse;
 import com.tool.ProjectTool.service.ProjectTaskService;
@@ -60,11 +61,23 @@ public class TaskController {
 
 		return new ResponseEntity<TaskDetails>(taskService.getTaskDetails(taskSeaquenceId), HttpStatus.OK);
 	}
+
+	@PostMapping("/updateTask")
+	public ResponseEntity<?> updateProjectTask(@RequestBody UpdateProjectTaskRequest updateTask) {
+
+		return new ResponseEntity<String>(taskService.updateTask(updateTask), HttpStatus.OK);
+	}
 	
-	@PutMapping("/updateTask")
-	public ResponseEntity<?> updateProjectTask(@RequestBody UpdateProjectTaskRequest updateTask){
+	@PostMapping("/createSubTask")
+	public ResponseEntity<?> createSubTask(@RequestBody RequestCreateSubtask subtaskRequest){
 		
-		return null;
+		return new ResponseEntity<String>(taskService.createSubtask(subtaskRequest), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/getSubtaskList/{parentId}")
+	public ResponseEntity<List<SubtaskList>> getSubtaskList(@PathVariable("parentId") String parentId){
+		
+		return new ResponseEntity<List<SubtaskList>>(taskService.getSubTaskList(parentId), HttpStatus.OK);
 	}
 
 }
