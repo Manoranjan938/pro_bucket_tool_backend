@@ -102,8 +102,8 @@ public class UserService {
 
 		if (user != null) {
 
-			user.setVerifyToken(null);
 			user.setEmailVerified(true);
+			user.setVerifyToken(null);
 
 			userRepo.save(user);
 

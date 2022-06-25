@@ -1,8 +1,12 @@
 package com.tool.ProjectTool.service;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
@@ -15,10 +19,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.tool.ProjectTool.entity.TeamDetails;
 import com.tool.ProjectTool.entity.Users;
+import com.tool.ProjectTool.exception.ProjectNotFoundException;
 import com.tool.ProjectTool.exception.UserAlreadyExistException;
 import com.tool.ProjectTool.model.request.RequestTeamMember;
 import com.tool.ProjectTool.model.response.EmailResponse;
+import com.tool.ProjectTool.model.response.TeamMembersList;
+import com.tool.ProjectTool.repo.TeamRepository;
 import com.tool.ProjectTool.repo.UserRepository;
 
 import freemarker.template.Configuration;
@@ -30,6 +38,9 @@ public class TeamService {
 	
 	@Autowired
 	private UserRepository userRepo;
+	
+	@Autowired
+	private TeamRepository teamRepo;
 	
 	@Autowired
 	private BCryptPasswordEncoder passEncode;
@@ -50,21 +61,23 @@ public class TeamService {
 		return sb.toString();
 	}
 
-	public String createNewTeamMember(RequestTeamMember team) {
+	public String createNewTeamMember(RequestTeamMember teamReq) {
 		
 		String ids = randomString(20);
 		String id = null;
 		
-		Users user = userRepo.findByEmail(team.getEmail());
+		Users user = userRepo.findByEmail(teamReq.getEmail());
 		Users checkIds = userRepo.findByUserId(ids);
 		
 		if(user != null) {
-			throw new UserAlreadyExistException("User with email " + team.getEmail() + " is already exists.");
+			throw new UserAlreadyExistException("User with email " + teamReq.getEmail() + " is already exists.");
 		}
 		
 		Users newUser = new Users();
+		TeamDetails team = new TeamDetails();
 		
 		String randomPass = RandomString.make(14);
+		String token = RandomString.make(60);
 		
 		if (checkIds != null) {
 			id = randomString(20);
@@ -73,15 +86,45 @@ public class TeamService {
 		}
 		
 		newUser.setUserId(id);
-		newUser.setEmail(team.getEmail());
-		newUser.setName(team.getName());
+		newUser.setEmail(teamReq.getEmail());
+		newUser.setName(teamReq.getName());
 		newUser.setEmailVerified(false);
 		newUser.setPassword(passEncode.encode(randomPass));
+		newUser.setRoleName("ROLE_TEAM-USER");
+		newUser.setVerifyToken(token);
 		
-		userRepo.save(newUser);
-		sendNewTeamMemberConfirmationEmail(team.getEmail(), randomPass);
+		Users newUs = userRepo.save(newUser);
 		
-		return "New team member added sucessfully";
+		team.setProjectId(teamReq.getProjectId());
+		team.setUserId(newUs.getId());
+		
+		teamRepo.save(team);
+		
+		//sendNewTeamMemberConfirmationEmail(teamReq.getEmail(), token);
+		
+		return "New team member added sucessfully with temporary password: " + randomPass;
+	}
+	
+	public List<TeamMembersList> getTeamList(String projectId) {
+
+		List<Object> teams = teamRepo.getTeamListByProject(projectId);
+		if (teams != null) {
+			List<TeamMembersList> teamList = new ArrayList<>();
+			Iterator itr = teams.iterator();
+			while (itr.hasNext()) {
+				Object[] row = (Object[]) itr.next();
+				TeamMembersList teamLi = new TeamMembersList();
+
+				teamLi.setEmail(String.valueOf(row[0]));
+				teamLi.setName(String.valueOf(row[1]));
+				teamLi.setUserid((BigInteger) row[2]);
+
+				teamList.add(teamLi);
+			}
+
+			return teamList;
+		}
+		throw new ProjectNotFoundException("Project not found with id" + projectId);
 	}
 	
 	public EmailResponse sendNewTeamMemberConfirmationEmail(String email, String secretString) {

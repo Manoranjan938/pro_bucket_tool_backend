@@ -1,12 +1,14 @@
-package com.tool.ProjectTool.model.request;
+package com.tool.ProjectTool.model.response;
 
-public class RequestTeamMember {
+import java.math.BigInteger;
+
+public class TeamMembersList {
 
 	private String email;
 	
 	private String name;
 	
-	private String projectId;
+	private BigInteger userid;
 
 	public String getEmail() {
 		return email;
@@ -24,12 +26,12 @@ public class RequestTeamMember {
 		this.name = name;
 	}
 
-	public String getProjectId() {
-		return projectId;
+	public BigInteger getUserid() {
+		return userid;
 	}
 
-	public void setProjectId(String projectId) {
-		this.projectId = projectId;
+	public void setUserid(BigInteger userid) {
+		this.userid = userid;
 	}
 	
 }
