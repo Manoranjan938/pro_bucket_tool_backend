@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -136,6 +138,16 @@ public class Comment {
 
 	public void setDeletedBy(String deletedBy) {
 		this.deletedBy = deletedBy;
+	}
+	
+	@PrePersist
+	protected void onCreate() {
+		this.commentedDate = new Date();
+	}
+	
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedDate = new Date();
 	}
 	
 }
