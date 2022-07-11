@@ -132,6 +132,7 @@ public class ProjectService {
 				response.setLeadBy(projects.getProjectLeader());
 				response.setProjectAvatar(projects.getProjectImage());
 				response.setProjectId(projects.getProjectId());
+				response.setProjectIdentifier(projects.getProjectIdentifier());
 
 				projectList.add(response);
 			}

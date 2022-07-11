@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tool.ProjectTool.entity.Backlog;
+import com.tool.ProjectTool.entity.ProjectEntity;
 import com.tool.ProjectTool.entity.ProjectTask;
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.ProjectNotFoundException;
@@ -15,10 +16,13 @@ import com.tool.ProjectTool.exception.TaskIdNotFoundException;
 import com.tool.ProjectTool.model.request.ProjectTaskRequest;
 import com.tool.ProjectTool.model.request.RequestCreateSubtask;
 import com.tool.ProjectTool.model.request.UpdateProjectTaskRequest;
+import com.tool.ProjectTool.model.response.HomeTaskCounts;
+import com.tool.ProjectTool.model.response.StatisticsResponse;
 import com.tool.ProjectTool.model.response.SubtaskList;
 import com.tool.ProjectTool.model.response.TaskDetails;
 import com.tool.ProjectTool.model.response.TaskListResponse;
 import com.tool.ProjectTool.repo.BacklogRepository;
+import com.tool.ProjectTool.repo.ProjectRepository;
 import com.tool.ProjectTool.repo.ProjectTaskRepository;
 import com.tool.ProjectTool.repo.UserRepository;
 
@@ -33,6 +37,9 @@ public class ProjectTaskService {
 
 	@Autowired
 	private UserRepository userRepo;
+	
+	@Autowired
+	private ProjectRepository projRepo;
 
 	public String addProjectTask(ProjectTaskRequest request) {
 
@@ -125,18 +132,26 @@ public class ProjectTaskService {
 			TaskDetails getTask = new TaskDetails();
 			Users user = userRepo.findByUserId(task.getAssignee());
 
-			if (user != null) {
+			if (user == null) {
+				getTask.setTaskName(task.getTaskName());
+				getTask.setTaskDesc(task.getTaskDesc());
+				getTask.setTaskSequence(task.getProjectSequence());
+				getTask.setPriority(task.getPriority());
+				getTask.setStatus(task.getStatus());
+				getTask.setCreatedOn(task.getCreatedAt());
+				getTask.setUpdatedOn(task.getUpdatedAt());
+				getTask.setAssignee("NA");
+
+			} else {
+				getTask.setTaskName(task.getTaskName());
+				getTask.setTaskDesc(task.getTaskDesc());
+				getTask.setTaskSequence(task.getProjectSequence());
+				getTask.setPriority(task.getPriority());
+				getTask.setStatus(task.getStatus());
+				getTask.setCreatedOn(task.getCreatedAt());
+				getTask.setUpdatedOn(task.getUpdatedAt());
 				getTask.setAssignee(user.getName());
 			}
-
-			getTask.setTaskName(task.getTaskName());
-			getTask.setTaskDesc(task.getTaskDesc());
-			getTask.setTaskSequence(task.getProjectSequence());
-			getTask.setPriority(task.getPriority());
-			getTask.setAssignee(null);
-			getTask.setStatus(task.getStatus());
-			getTask.setCreatedOn(task.getCreatedAt());
-			getTask.setUpdatedOn(task.getUpdatedAt());
 
 			return getTask;
 		}
@@ -147,10 +162,11 @@ public class ProjectTaskService {
 	public String updateTask(UpdateProjectTaskRequest updateTask) {
 
 		ProjectTask task = projectTaskRepo.findByProjectSequence(updateTask.getTaskId());
+		Users user = userRepo.findByEmail(updateTask.getAssignee());
 
 		if (task != null) {
 
-			task.setAssignee(updateTask.getAssignee());
+			task.setAssignee(user.getUserId());
 			task.setPriority(updateTask.getPriority());
 			task.setTaskDesc(updateTask.getDescription());
 			task.setStatus(updateTask.getStatus());
@@ -200,6 +216,78 @@ public class ProjectTaskService {
 			throw new ProjectNotFoundException("Project not found");
 		}
 
+	}
+	
+	public List<TaskListResponse> getTaskListsByAssignee(String email) {
+		
+		Users user = userRepo.findByEmail(email);
+		List<Object> tasks = projectTaskRepo.getTaskListsByAssignee(user.getUserId());
+		Iterator it = tasks.iterator();
+		List<TaskListResponse> taskLists = new ArrayList<>();
+		while(it.hasNext()) {
+			Object[] row = (Object[]) it.next();
+			TaskListResponse task = new TaskListResponse();
+			
+			task.setTaskName(String.valueOf(row[0]));
+			task.setTaskType(String.valueOf(row[1]));
+			task.setTaskSequence(String.valueOf(row[2]));
+			task.setPriority(String.valueOf(row[3]));
+			task.setStatus(String.valueOf(row[4]));
+			task.setAssignee(String.valueOf(row[5]));
+			
+			taskLists.add(task);
+		}
+		
+		return taskLists;
+	}
+	
+	public StatisticsResponse getStatisticInfo(String taskId) {
+
+		Integer total = projectTaskRepo.getTotalSubtasks(taskId);
+		Integer completed = projectTaskRepo.getCompletedSubtasks(taskId);
+		Integer inProgress = projectTaskRepo.getInProgressSubtasks(taskId);
+		Integer pending = projectTaskRepo.getPendingSubtasks(taskId);
+
+		Integer completedTasks = 0;
+		Integer pendingTasks = 0;
+		Integer inprogressTask = 0;
+
+		if (completed != 0) {
+			completedTasks = completed * 100 / total;
+		} else if (inProgress != 0) {
+			inprogressTask = inProgress * 100 / total;
+		} else if (pending != 0) {
+			pendingTasks = pending * 100 / total;
+		}
+
+		StatisticsResponse stats = new StatisticsResponse();
+
+		stats.setCompleted(completedTasks);
+		stats.setInprogress(inprogressTask);
+		stats.setPending(pendingTasks);
+
+		return stats;
+	}
+	
+	public HomeTaskCounts getHomeStatsData(String proj) {
+
+		ProjectEntity project = projRepo.findByProjectId(proj);
+		HomeTaskCounts count = new HomeTaskCounts();
+		if (project != null) {
+			Backlog back = backlogRepo.findByProjectIdentifier(project.getProjectIdentifier());
+
+			Integer total = projectTaskRepo.getTotalTaskByProject(back.getId().intValue());
+			Integer completed = projectTaskRepo.getCompletedTaskByProject(back.getId().intValue());
+			Integer inProgress = projectTaskRepo.getInProgressTaskByProject(back.getId().intValue());
+			Integer pending = projectTaskRepo.getPendingTaskByProject(back.getId().intValue());
+
+			count.setTotal(total);
+			count.setCompleted(completed);
+			count.setInprogress(inProgress);
+			count.setPending(pending);
+		}
+
+		return count;
 	}
 
 }
