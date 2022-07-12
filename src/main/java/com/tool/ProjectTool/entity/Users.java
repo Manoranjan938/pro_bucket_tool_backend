@@ -1,12 +1,14 @@
 package com.tool.ProjectTool.entity;
 
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -48,6 +50,8 @@ public class Users implements UserDetails {
 	private boolean emailVerified;
 	
 	private String verifyToken;
+	
+	private Date addedDate;
 
 	public Users() {
 		super();
@@ -147,6 +151,19 @@ public class Users implements UserDetails {
 
 	public void setVerifyToken(String verifyToken) {
 		this.verifyToken = verifyToken;
+	}
+
+	public Date getAddedDate() {
+		return addedDate;
+	}
+
+	public void setAddedDate(Date addedDate) {
+		this.addedDate = addedDate;
+	}
+	
+	@PrePersist
+	protected void onCreate() {
+		this.addedDate = new Date();
 	}
 
 	@Override
