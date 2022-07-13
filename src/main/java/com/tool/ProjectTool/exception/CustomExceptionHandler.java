@@ -56,4 +56,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<Object>(exceptionResponse, HttpStatus.BAD_REQUEST);
 		
 	}
+	
+	@ExceptionHandler
+	public final ResponseEntity<Object> handleDataNotFoundException(DataNotFoundException ex, WebRequest request){
+		
+		DataNotFoundExceptionResponse exceptionResponse = new DataNotFoundExceptionResponse(ex.getMessage());
+		
+		return new ResponseEntity<Object>(exceptionResponse, HttpStatus.BAD_REQUEST);
+		
+	}
 }

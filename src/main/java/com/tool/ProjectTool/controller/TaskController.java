@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tool.ProjectTool.model.request.ProjectTaskRequest;
 import com.tool.ProjectTool.model.request.RequestCreateSubtask;
 import com.tool.ProjectTool.model.request.UpdateProjectTaskRequest;
+import com.tool.ProjectTool.model.response.HomeTaskCounts;
+import com.tool.ProjectTool.model.response.StatisticsResponse;
 import com.tool.ProjectTool.model.response.SubtaskList;
 import com.tool.ProjectTool.model.response.TaskDetails;
 import com.tool.ProjectTool.model.response.TaskListResponse;
@@ -78,6 +80,24 @@ public class TaskController {
 	public ResponseEntity<List<SubtaskList>> getSubtaskList(@PathVariable("parentId") String parentId){
 		
 		return new ResponseEntity<List<SubtaskList>>(taskService.getSubTaskList(parentId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getTasksByAssignee/{assigneeEmail}")
+	public ResponseEntity<List<TaskListResponse>> getTaskListsByAssignee(@PathVariable("assigneeEmail") String email){
+		
+		return new ResponseEntity<List<TaskListResponse>>(taskService.getTaskListsByAssignee(email), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getStatistics/{taskId}")
+	public ResponseEntity<StatisticsResponse> getTaskStatistics(@PathVariable("taskId") String id){
+		
+		return new ResponseEntity<StatisticsResponse>(taskService.getStatisticInfo(id), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getHomeTaskCounts/{projectid}")
+	public ResponseEntity<HomeTaskCounts> getHomeTaskCounts(@PathVariable("projectid") String projectId){
+		
+		return new ResponseEntity<HomeTaskCounts>(taskService.getHomeStatsData(projectId), HttpStatus.OK);
 	}
 
 }

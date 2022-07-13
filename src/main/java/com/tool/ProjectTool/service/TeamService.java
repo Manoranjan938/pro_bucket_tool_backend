@@ -19,12 +19,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.tool.ProjectTool.entity.ProjectEntity;
 import com.tool.ProjectTool.entity.TeamDetails;
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.ProjectNotFoundException;
 import com.tool.ProjectTool.exception.UserAlreadyExistException;
 import com.tool.ProjectTool.model.request.RequestTeamMember;
+import com.tool.ProjectTool.model.request.UpdateTeamRequest;
 import com.tool.ProjectTool.model.response.EmailResponse;
+import com.tool.ProjectTool.model.response.ProjectResponse;
 import com.tool.ProjectTool.model.response.TeamMembersList;
 import com.tool.ProjectTool.repo.TeamRepository;
 import com.tool.ProjectTool.repo.UserRepository;
@@ -87,6 +90,7 @@ public class TeamService {
 		
 		newUser.setUserId(id);
 		newUser.setEmail(teamReq.getEmail());
+		newUser.setUsername(teamReq.getEmail());
 		newUser.setName(teamReq.getName());
 		newUser.setEmailVerified(false);
 		newUser.setPassword(passEncode.encode(randomPass));
@@ -100,7 +104,7 @@ public class TeamService {
 		
 		teamRepo.save(team);
 		
-		//sendNewTeamMemberConfirmationEmail(teamReq.getEmail(), token);
+		sendNewTeamMemberConfirmationEmail(teamReq.getEmail(), token);
 		
 		return "New team member added sucessfully with temporary password: " + randomPass;
 	}
@@ -118,6 +122,9 @@ public class TeamService {
 				teamLi.setEmail(String.valueOf(row[0]));
 				teamLi.setName(String.valueOf(row[1]));
 				teamLi.setUserid((BigInteger) row[2]);
+				teamLi.setAddedDate(String.valueOf(row[3]));
+				teamLi.setRole(String.valueOf(row[5]));
+				teamLi.setStatus((Integer) row[4]);
 
 				teamList.add(teamLi);
 			}
@@ -127,6 +134,66 @@ public class TeamService {
 		throw new ProjectNotFoundException("Project not found with id" + projectId);
 	}
 	
+	public List<ProjectResponse> getAllProjects(String userId) {
+
+		Users user = userRepo.findByUserId(userId);
+		if (user != null) {
+
+			List<Object> project = teamRepo.getProjectsByTeamMember(user.getId().intValue());
+			List<ProjectResponse> projectList = new ArrayList<>();
+
+			if (!project.isEmpty()) {
+
+				Iterator itr = project.iterator();
+				while (itr.hasNext()) {
+					Object[] row = (Object[]) itr.next();
+
+					ProjectResponse pr = new ProjectResponse();
+					pr.setProjectName(String.valueOf(row[0]));
+					pr.setProjectId(String.valueOf(row[1]));
+					pr.setProjectIdentifier(String.valueOf(row[2]));
+					pr.setLeadBy(String.valueOf(row[3]));
+					pr.setProjectType(String.valueOf(row[4]));
+					pr.setProjectAvatar(String.valueOf(row[5]));
+
+					projectList.add(pr);
+
+				}
+			}
+
+			return projectList;
+
+		}
+		throw new ProjectNotFoundException("Project not found with userid: " + userId);
+	}
+	
+	public String updateTeamMember(UpdateTeamRequest teamRe) {
+
+		TeamDetails team = teamRepo.findByUserId(teamRe.getUserid());
+
+		if (team != null) {
+
+			Users user = userRepo.getById(teamRe.getUserid());
+
+			if (user != null) {
+				team.setTeamRole(teamRe.getRole());
+				teamRepo.save(team);
+
+				if (teamRe.getStatus().equalsIgnoreCase("Inactive")) {
+					user.setStatus(1);
+				}
+				if(teamRe.getStatus().equalsIgnoreCase("active")){
+					user.setStatus(0);
+				}
+
+				userRepo.save(user);
+			}
+			return "User updated successfully";
+		}
+
+		return null;
+	}
+
 	public EmailResponse sendNewTeamMemberConfirmationEmail(String email, String secretString) {
 
 		EmailResponse response = new EmailResponse();
@@ -141,9 +208,9 @@ public class TeamService {
 
 			// helper.addAttachment("logo.png", new ClassPathResource("/static/logo.png"));
 
-			model.put("secretString", secretString);
+			model.put("token", secretString);
 
-			Template t = config.getTemplate("new-team-member-template.ftl");
+			Template t = config.getTemplate("registration-confirmation-template.ftl");
 			String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
 
 			helper.setTo(email);

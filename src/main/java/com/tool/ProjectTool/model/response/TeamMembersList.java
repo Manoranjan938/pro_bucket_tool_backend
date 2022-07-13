@@ -9,6 +9,12 @@ public class TeamMembersList {
 	private String name;
 	
 	private BigInteger userid;
+	
+	private String role;
+	
+	private String addedDate;
+	
+	private int status;
 
 	public String getEmail() {
 		return email;
@@ -32,6 +38,30 @@ public class TeamMembersList {
 
 	public void setUserid(BigInteger userid) {
 		this.userid = userid;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public String getAddedDate() {
+		return addedDate;
+	}
+
+	public void setAddedDate(String addedDate) {
+		this.addedDate = addedDate;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 	
 }
