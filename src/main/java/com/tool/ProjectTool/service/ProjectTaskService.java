@@ -166,7 +166,9 @@ public class ProjectTaskService {
 
 		if (task != null) {
 
-			task.setAssignee(user.getUserId());
+			if(user != null) {
+				task.setAssignee(user.getUserId());
+			}
 			task.setPriority(updateTask.getPriority());
 			task.setTaskDesc(updateTask.getDescription());
 			task.setStatus(updateTask.getStatus());
@@ -211,7 +213,7 @@ public class ProjectTaskService {
 
 			projectTaskRepo.save(projTask);
 
-			return "Task created successfully";
+			return "SubTask created successfully";
 		} catch (Exception e) {
 			throw new ProjectNotFoundException("Project not found");
 		}
