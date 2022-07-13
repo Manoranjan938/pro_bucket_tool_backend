@@ -83,7 +83,7 @@ public class AuthController {
 		return new ResponseEntity<String>(message, HttpStatus.OK);
 	}
 
-	@PostMapping("/resetPassword")
+	@PostMapping("/resetMyPassword")
 	public ResponseEntity<?> updatePassword(@RequestParam("token") String token, @RequestParam("pass") String pass) {
 
 		String message = userService.resetPassword(token, pass);

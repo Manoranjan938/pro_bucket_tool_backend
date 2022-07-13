@@ -18,6 +18,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import com.tool.ProjectTool.entity.Users;
 import com.tool.ProjectTool.exception.UserAlreadyExistException;
 import com.tool.ProjectTool.exception.UserNotFoundException;
+import com.tool.ProjectTool.model.request.UpdatePasswordRequest;
 import com.tool.ProjectTool.model.request.UpdateUserRequest;
 import com.tool.ProjectTool.model.request.UserRequest;
 import com.tool.ProjectTool.model.response.EmailResponse;
@@ -192,6 +193,20 @@ public class UserService {
 		}
 
 		throw new UserNotFoundException("User does not exist or invalid token");
+	}
+	
+	public String updatePassword(UpdatePasswordRequest passReq) {
+		
+		Users user = userRepo.findByUserId(passReq.getUserId());
+		if(user != null) {
+			
+			user.setPassword(passEncode.encode(passReq.getPassword()));
+			
+			userRepo.save(user);
+			return "Password updated successdully";
+		}
+		
+		throw new UserNotFoundException("User does not exist");
 	}
 
 	public EmailResponse sendRegistrationConfirmationEmail(String email, String token) {

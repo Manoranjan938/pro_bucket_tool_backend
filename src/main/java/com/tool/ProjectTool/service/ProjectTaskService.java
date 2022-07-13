@@ -249,19 +249,21 @@ public class ProjectTaskService {
 		Integer completed = projectTaskRepo.getCompletedSubtasks(taskId);
 		Integer inProgress = projectTaskRepo.getInProgressSubtasks(taskId);
 		Integer pending = projectTaskRepo.getPendingSubtasks(taskId);
-
+		
 		Integer completedTasks = 0;
 		Integer pendingTasks = 0;
 		Integer inprogressTask = 0;
 
 		if (completed != 0) {
 			completedTasks = completed * 100 / total;
-		} else if (inProgress != 0) {
+		}
+		if (inProgress != 0) {
 			inprogressTask = inProgress * 100 / total;
-		} else if (pending != 0) {
+		}
+		if (pending != 0) {
 			pendingTasks = pending * 100 / total;
 		}
-
+		
 		StatisticsResponse stats = new StatisticsResponse();
 
 		stats.setCompleted(completedTasks);
